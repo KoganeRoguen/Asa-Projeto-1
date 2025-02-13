@@ -1,0 +1,68 @@
+services:
+
+  wordpress-1:
+    image: wordpress
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: user
+      WORDPRESS_DB_PASSWORD: 123
+      WORDPRESS_DB_NAME: db
+    volumes:
+      - wordpress-1:/var/www/html
+    networks:
+      - cliente-1
+      - rede-proxy
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - cliente-1
+  db2:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: db2
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db2:/var/lib/mysql
+    networks:
+      - cliente-1
+
+  wordpress-2:
+    image: wordpress
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db2
+      WORDPRESS_DB_USER: user
+      WORDPRESS_DB_PASSWORD: 123
+      WORDPRESS_DB_NAME: db2
+    volumes:
+      - wordpress-2:/var/www/html
+    networks:
+      - cliente-1
+      - rede-proxy
+
+  
+
+volumes:
+  wordpress-1:
+  wordpress-2:
+  db:
+  db2:
+
+networks:
+  cliente-1:
+    driver: bridge
+  rede-proxy:
+    external: true

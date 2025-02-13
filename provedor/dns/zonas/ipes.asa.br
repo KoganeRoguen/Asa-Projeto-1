@@ -1,0 +1,15 @@
+;
+; BIND data file for asa.br zone
+; in www physical ip
+$TTL	604800
+@	IN	SOA	ns.tibau-sul.asa.br. tibau-sul.asa.br. (
+			      3		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@		IN	NS		ns.
+@		IN	A		10.24.17.22
+www 	IN	A		10.24.17.22
+portal	IN	CNAME	www

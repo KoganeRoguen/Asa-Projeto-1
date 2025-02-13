@@ -1,0 +1,17 @@
+;
+; BIND data file for asa.br zone
+; in www physical ip
+$TTL	604800
+@	IN	SOA	ns.neopolis.asa.br. neopolis.asa.br. (
+			      3		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@		IN	NS		ns.
+@		IN	MX	10	mail.
+@		IN	A		10.25.2.22
+mail	IN	A	10.24.17.22
+www 	IN	A	10.24.17.22
+portal	IN	CNAME	www

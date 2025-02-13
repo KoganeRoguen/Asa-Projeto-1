@@ -1,0 +1,94 @@
+
+services:
+  dns:
+    build:
+      context: ./dns
+      dockerfile: Dockerfile
+    container_name: dns
+    ports:
+      - "53:53/udp"
+
+  proxy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    container_name: proxy
+    networks:
+      - provedor
+      - rede-proxy
+    ports:
+      - "80:80/tcp"
+    depends_on:
+      - mailserver
+
+  mailserver:
+    image: docker.io/mailserver/docker-mailserver:latest
+    container_name: mailserver
+    hostname: mail.neopolis.asa.br
+    domainname: neopolis.asa.br
+    environment:
+      - ENABLE_SPAMASSASSIN=1
+      - ENABLE_CLAMAV=1
+      - ENABLE_POSTGREY=1
+      - ONE_DIR=1
+      - ENABLE_FAIL2BAN=1
+      - PERMIT_DOCKER=host
+    volumes:
+      - maildata:/var/mail
+      - mailstate:/var/mail-state
+      - maillogs:/var/log/mail
+      - ./docker-data/docker-mailserver:/tmp/docker-mailserver
+    ports:
+      - "25:25"
+      - "143:143"
+      - "587:587"
+      - "993:993"
+    networks:
+      - provedor
+
+  roundcubedb:
+    image: mysql:latest
+    container_name: roundcubedb
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=roundcube-mysql-pw
+      - MYSQL_DATABASE=roundcubemail
+    networks:
+      - provedor
+
+  roundcubemail:
+    image: roundcube/roundcubemail:latest
+    container_name: roundcubemailt
+    depends_on:
+      - roundcubedb
+      - mailserver
+    volumes:
+      - roundcube:/var/www/html
+    ports:
+      - 9001:80
+    environment:
+      - ROUNDCUBEMAIL_DB_TYPE=mysql
+      - ROUNDCUBEMAIL_DB_HOST=roundcubedb
+      - ROUNDCUBEMAIL_DB_PASSWORD=roundcube-mysql-pw
+      - ROUNDCUBEMAIL_SKIN=elastic
+      - ROUNDCUBEMAIL_DEFAULT_HOST=tls://mail.neopolis.asa.br
+      - ROUNDCUBEMAIL_SMTP_SERVER=tls://mail.neopolis.asa.br
+      - ROUNDCUBEMAIL_SMTP_PORT=587
+      - ROUNDCUBEMAIL_SMTP_SECURE=tls
+      - ROUNDCUBEMAIL_DEFAULT_PORT=143
+    networks:
+      - provedor
+
+volumes:
+  maildata:
+  mailstate:
+  maillogs:
+  roundcube:
+  db:
+
+networks:
+  provedor:
+    driver: bridge
+  rede-proxy:
+    external: true
