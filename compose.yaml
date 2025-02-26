@@ -13,13 +13,16 @@ services:
       context: ./proxy
       dockerfile: Dockerfile
     container_name: proxy
+    restart: unless-stopped
     networks:
       - provedor
       - rede-proxy
     ports:
       - "80:80/tcp"
+      - "443:443/udp"
     depends_on:
       - mailserver
+
 
   mailserver:
     image: docker.io/mailserver/docker-mailserver:latest

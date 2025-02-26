@@ -8,3 +8,6 @@ COPY nginx.conf /etc/nginx
 #conf
 RUN mkdir -p /usr/share/nginx/alisson
 COPY index.html /usr/share/nginx/alisson
+
+RUN mkdir -p ./certbot
+RUN mkdir -p ./certbot/conf
